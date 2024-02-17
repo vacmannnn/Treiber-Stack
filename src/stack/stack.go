@@ -1,6 +1,7 @@
 package stack
 
 import (
+    "fmt"
     "sync/atomic"
     "unsafe"
 )
@@ -33,6 +34,16 @@ func (s *Stack) Pop() {
 
 }
 
-func (s *Stack) Stringer() {
-
+func (s *Stack) String() string {
+    if s.head == nil {
+        return "Empty stack"
+    }
+    elemCounter := 0
+    curHead := s.head
+    for curHead != nil {
+        head := *(*node)(curHead)
+        elemCounter++
+        curHead = head.next
+    }
+    return fmt.Sprintf("%d elements in stack", elemCounter)
 }
