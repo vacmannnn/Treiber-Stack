@@ -18,21 +18,21 @@ func NewStack() Stack {
     return Stack{}
 }
 
-func (s Stack) Push(value int) {
+func (s *Stack) Push(value int) {
     newNode := &node{value: value}
     for {
         head := atomic.LoadPointer(&s.head)
         newNode.next = head
-        if atomic.CompareAndSwapPointer(&head, newNode.next, unsafe.Pointer(newNode)) {
+        if atomic.CompareAndSwapPointer(&s.head, head, unsafe.Pointer(newNode)) {
             return
         }
     }
 }
 
-func (s Stack) Pop() {
+func (s *Stack) Pop() {
 
 }
 
-func (s Stack) Stringer() {
+func (s *Stack) Stringer() {
 
 }
