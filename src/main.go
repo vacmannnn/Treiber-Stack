@@ -8,9 +8,30 @@ import (
     "time"
 )
 
-const goroutineNumber = 50000000
+const goroutineNumber = 1000000
 
 func main() {
+    simplePopTest()
+    simplePushBench()
+}
+
+func simplePopTest() {
+    myStack := stack.NewStack()
+    myStack.Push(10)
+    myStack.Push(123)
+    myStack.Push(900)
+    fmt.Println(&myStack)
+    res, _ := myStack.Pop()
+    fmt.Println(res, &myStack)
+    res, _ = myStack.Pop()
+    fmt.Println(res, &myStack)
+    res, _ = myStack.Pop()
+    fmt.Println(res, &myStack)
+    res, err := myStack.Pop()
+    fmt.Println(res, err, &myStack)
+}
+
+func simplePushBench() {
     fmt.Printf("GOMAXPROCS=%d\n", runtime.GOMAXPROCS(0))
     myStack := stack.NewStack()
     fmt.Println("Single thread")
@@ -19,7 +40,8 @@ func main() {
         myStack.Push(i)
     }
     fmt.Println(time.Now().Sub(now).Truncate(time.Millisecond))
-    fmt.Println(&myStack)
+    top, _ := myStack.Top()
+    fmt.Println(&myStack, top)
 
     fmt.Println()
     myStack = stack.NewStack()
@@ -35,6 +57,7 @@ func main() {
     }
     wg.Wait()
     fmt.Println(time.Now().Sub(now).Truncate(time.Millisecond))
-    fmt.Println(&myStack)
+    top, _ = myStack.Top()
+    fmt.Println(&myStack, top)
     fmt.Println("\n\n\n")
 }
