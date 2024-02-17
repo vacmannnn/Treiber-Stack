@@ -1,6 +1,7 @@
 package stack
 
 import (
+    "errors"
     "fmt"
     "sync/atomic"
     "unsafe"
@@ -30,9 +31,17 @@ func (s *Stack) Push(value int) {
     }
 }
 
-// err if pop on empty stack
 func (s *Stack) Pop() (int, error) {
-    return 0, nil
+    for {
+        head := s.head
+        if head == nil {
+            return 0, errors.New("Pop on empty stack")
+        }
+        n := *(*node)(head)
+        if atomic.CompareAndSwapPointer(&s.head, head, n.next) {
+            return n.value, nil
+        }
+    }
 }
 
 // Top return false if stack is empty
