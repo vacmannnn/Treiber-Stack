@@ -30,10 +30,21 @@ func (s *Stack) Push(value int) {
     }
 }
 
-func (s *Stack) Pop() {
-
+// err if pop on empty stack
+func (s *Stack) Pop() (int, error) {
+    return 0, nil
 }
 
+// Top return false if stack is empty
+func (s *Stack) Top() (int, bool) {
+    if s.head == nil {
+        return 0, false
+    }
+    head := *(*node)(s.head)
+    return head.value, true
+}
+
+// empty if 0 elements else num of elem
 func (s *Stack) String() string {
     if s.head == nil {
         return "Empty stack"
