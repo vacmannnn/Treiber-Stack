@@ -59,5 +59,4 @@ func simplePushBench() {
     fmt.Println(time.Since(startTime).Truncate(time.Millisecond))
     top, _ = myStack.Top()
     fmt.Println(&myStack, top)
-    fmt.Println("\n\n\n")
 }
