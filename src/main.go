@@ -35,11 +35,11 @@ func simplePushBench() {
     fmt.Printf("GOMAXPROCS=%d\n", runtime.GOMAXPROCS(0))
     myStack := stack.NewStack()
     fmt.Println("Single thread")
-    now := time.Now()
+    startTime := time.Now()
     for i := range goroutineNumber {
         myStack.Push(i)
     }
-    fmt.Println(time.Now().Sub(now).Truncate(time.Millisecond))
+    fmt.Println(time.Since(startTime).Truncate(time.Millisecond))
     top, _ := myStack.Top()
     fmt.Println(&myStack, top)
 
@@ -48,7 +48,7 @@ func simplePushBench() {
     wg := sync.WaitGroup{}
     wg.Add(goroutineNumber)
     fmt.Println("Concurrent/parallel")
-    now = time.Now()
+    startTime = time.Now()
     for i := range goroutineNumber {
         go func(i int) {
             myStack.Push(i)
@@ -56,7 +56,7 @@ func simplePushBench() {
         }(i)
     }
     wg.Wait()
-    fmt.Println(time.Now().Sub(now).Truncate(time.Millisecond))
+    fmt.Println(time.Since(startTime).Truncate(time.Millisecond))
     top, _ = myStack.Top()
     fmt.Println(&myStack, top)
     fmt.Println("\n\n\n")
