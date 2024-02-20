@@ -21,4 +21,4 @@ jobs:
         run: go build -C src
 
       - name: Test
-        run: go test -C src ./... -v
+        run: go test -C src ./... -v -race
