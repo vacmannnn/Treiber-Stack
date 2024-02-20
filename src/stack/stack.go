@@ -16,10 +16,13 @@ type Stack struct {
     head unsafe.Pointer
 }
 
+// NewStack creates new stack instance
 func NewStack() Stack {
     return Stack{}
 }
 
+// Push value to top of stack. Concurrency-safety,
+// possible to use with many goroutines.
 func (s *Stack) Push(value int) {
     newNode := &node{value: value}
     for {
@@ -31,6 +34,10 @@ func (s *Stack) Push(value int) {
     }
 }
 
+// Pop removes value from top of stack. Returns removed value or
+// error if stack was empty.
+//
+// Concurrency-safety, possible to use with many goroutines.
 func (s *Stack) Pop() (int, error) {
     for {
         head := s.head
@@ -44,7 +51,7 @@ func (s *Stack) Pop() (int, error) {
     }
 }
 
-// Top return false if stack is empty
+// Top returns last element in stack. Returns false if stack was empty
 func (s *Stack) Top() (int, bool) {
     if s.head == nil {
         return 0, false
@@ -53,7 +60,8 @@ func (s *Stack) Top() (int, bool) {
     return head.value, true
 }
 
-// empty if 0 elements else num of elem
+// String describes how many elements on stack, returns
+// "empty stack" or "N elements in stack"
 func (s *Stack) String() string {
     if s.head == nil {
         return "Empty stack"
