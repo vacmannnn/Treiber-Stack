@@ -16,7 +16,6 @@ type node[T any] struct {
 
 type Stack[T any] struct {
     head unsafe.Pointer
-    nd   node[T]
 }
 
 // NewStack creates new stack instance
