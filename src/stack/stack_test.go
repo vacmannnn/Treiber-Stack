@@ -1,8 +1,6 @@
 package stack
 
 import (
-    "fmt"
-    "strings"
     "sync"
     "testing"
 )
@@ -14,9 +12,9 @@ func TestPop(t *testing.T) {
         myStack.Push(i)
     }
     if myStack.String() != "3 elements in stack" {
-        elementsInStack := strings.Fields(myStack.String())[0]
-        t.Errorf("Expected %d elements, but get %s", elements, elementsInStack)
+        t.Errorf("Expected %d elements, but get %d", elements, myStack.Size())
     }
+
     for i := 0; i < elements; i++ {
         res, err := myStack.Pop()
         if err != nil {
@@ -25,6 +23,7 @@ func TestPop(t *testing.T) {
             t.Errorf("Expected %d on top of stack, but get %d", elements-1-i, res)
         }
     }
+
     _, err := myStack.Pop()
     if err == nil {
         t.Error("Stack expected to be empty")
@@ -37,9 +36,9 @@ func TestPush(t *testing.T) {
     for i := 0; i < elements; i++ {
         myStack.Push(i)
     }
-    if myStack.String() != fmt.Sprintf("%d elements in stack", elements) {
-        elementsInStack := strings.Fields(myStack.String())[0]
-        t.Errorf("Expected %d elements, but get %s", elements, elementsInStack)
+
+    if elements != myStack.Size() {
+        t.Errorf("Expected %d elements, but got %d", elements, myStack.Size())
     }
 }
 
@@ -55,8 +54,8 @@ func TestPushConcurrently(t *testing.T) {
         }(i)
     }
     wg.Wait()
-    if myStack.String() != fmt.Sprintf("%d elements in stack", goroutineNumber) {
-        elementsInStack := strings.Fields(myStack.String())[0]
-        t.Errorf("Expected %d elements, but get %s", goroutineNumber, elementsInStack)
+
+    if goroutineNumber != myStack.Size() {
+        t.Errorf("Expected %d elements, but got %d", goroutineNumber, myStack.Size())
     }
 }

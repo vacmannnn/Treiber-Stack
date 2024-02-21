@@ -3,6 +3,8 @@ package stack
 import (
     "errors"
     "fmt"
+    "strconv"
+    "strings"
     "sync/atomic"
     "unsafe"
 )
@@ -74,4 +76,10 @@ func (s *Stack) String() string {
         curHead = head.next
     }
     return fmt.Sprintf("%d elements in stack", elemCounter)
+}
+
+// Size returns number of elements in stack
+func (s *Stack) Size() int {
+    elementsInStack, _ := strconv.Atoi(strings.Fields(s.String())[0])
+    return elementsInStack
 }
