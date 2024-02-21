@@ -6,7 +6,7 @@ import (
 )
 
 func TestPop(t *testing.T) {
-    myStack := NewStack()
+    myStack := NewStack[int]()
     elements := 3
     for i := 0; i < elements; i++ {
         myStack.Push(i)
@@ -32,7 +32,7 @@ func TestPop(t *testing.T) {
 
 func TestPush(t *testing.T) {
     const elements = 100000
-    myStack := NewStack()
+    myStack := NewStack[int]()
     for i := 0; i < elements; i++ {
         myStack.Push(i)
     }
@@ -44,7 +44,7 @@ func TestPush(t *testing.T) {
 
 func TestPushConcurrently(t *testing.T) {
     const goroutineNumber = 100000
-    myStack := NewStack()
+    myStack := NewStack[int]()
     wg := sync.WaitGroup{}
     wg.Add(goroutineNumber)
     for i := 0; i < goroutineNumber; i++ {

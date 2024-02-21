@@ -9,24 +9,25 @@ import (
     "unsafe"
 )
 
-type node struct {
-    value int
+type node[T any] struct {
+    value T
     next  unsafe.Pointer
 }
 
-type Stack struct {
+type Stack[T any] struct {
     head unsafe.Pointer
+    nd   node[T]
 }
 
 // NewStack creates new stack instance
-func NewStack() Stack {
-    return Stack{}
+func NewStack[T any]() Stack[T] {
+    return Stack[T]{}
 }
 
 // Push value to top of stack. Concurrency-safety,
 // possible to use with many goroutines.
-func (s *Stack) Push(value int) {
-    newNode := &node{value: value}
+func (s *Stack[T]) Push(value T) {
+    newNode := &node[T]{value: value}
     for {
         head := atomic.LoadPointer(&s.head)
         newNode.next = head
@@ -40,13 +41,14 @@ func (s *Stack) Push(value int) {
 // error if stack was empty.
 //
 // Concurrency-safety, possible to use with many goroutines.
-func (s *Stack) Pop() (int, error) {
+func (s *Stack[T]) Pop() (T, error) {
     for {
         head := s.head
         if head == nil {
-            return 0, errors.New("Pop on empty stack")
+            var nilVal T
+            return nilVal, errors.New("pop on empty stack")
         }
-        n := *(*node)(head)
+        n := *(*node[T])(head)
         if atomic.CompareAndSwapPointer(&s.head, head, n.next) {
             return n.value, nil
         }
@@ -54,24 +56,25 @@ func (s *Stack) Pop() (int, error) {
 }
 
 // Top returns last element in stack. Returns false if stack was empty
-func (s *Stack) Top() (int, bool) {
+func (s *Stack[T]) Top() (T, bool) {
     if s.head == nil {
-        return 0, false
+        var nilVal T
+        return nilVal, false
     }
-    head := *(*node)(s.head)
+    head := *(*node[T])(s.head)
     return head.value, true
 }
 
 // String describes how many elements on stack, returns
 // "empty stack" or "N elements in stack"
-func (s *Stack) String() string {
+func (s *Stack[T]) String() string {
     if s.head == nil {
         return "Empty stack"
     }
     elemCounter := 0
     curHead := s.head
     for curHead != nil {
-        head := *(*node)(curHead)
+        head := *(*node[T])(curHead)
         elemCounter++
         curHead = head.next
     }
@@ -79,7 +82,7 @@ func (s *Stack) String() string {
 }
 
 // Size returns number of elements in stack
-func (s *Stack) Size() int {
+func (s *Stack[T]) Size() int {
     elementsInStack, _ := strconv.Atoi(strings.Fields(s.String())[0])
     return elementsInStack
 }
