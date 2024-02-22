@@ -18,13 +18,14 @@ type Stack[T any] struct {
     head unsafe.Pointer
 }
 
-// NewStack creates new stack instance
+// NewStack creates new stack instance.
 func NewStack[T any]() Stack[T] {
     return Stack[T]{}
 }
 
-// Push value to top of stack. Concurrency-safety,
-// possible to use with many goroutines.
+// Push value to top of stack.
+//
+//Concurrency-safety, possible to use with many goroutines.
 func (s *Stack[T]) Push(value T) {
     newNode := &node[T]{value: value}
     for {
@@ -54,7 +55,7 @@ func (s *Stack[T]) Pop() (T, error) {
     }
 }
 
-// Top returns last element in stack. Returns false if stack was empty
+// Top returns last element in stack. Returns false if stack was empty.
 func (s *Stack[T]) Top() (T, bool) {
     if s.head == nil {
         var nilVal T
@@ -65,7 +66,9 @@ func (s *Stack[T]) Top() (T, bool) {
 }
 
 // String describes how many elements on stack, returns
-// "empty stack" or "N elements in stack"
+// "empty stack" or "N elements in stack".
+//
+// Aware: not concurrency-safety.
 func (s *Stack[T]) String() string {
     if s.head == nil {
         return "Empty stack"
@@ -80,7 +83,9 @@ func (s *Stack[T]) String() string {
     return fmt.Sprintf("%d elements in stack", elemCounter)
 }
 
-// Size returns number of elements in stack
+// Size returns number of elements in stack.
+//
+// Aware: not concurrency-safety.
 func (s *Stack[T]) Size() int {
     elementsInStack, _ := strconv.Atoi(strings.Fields(s.String())[0])
     return elementsInStack
