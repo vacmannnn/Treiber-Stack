@@ -15,7 +15,7 @@ const elements = 83_160_000
 func BenchSingleThread() {
     myStack := stack.NewStack[int]()
     startTime := time.Now()
-    for i := 0; i < elements; i++ {
+    for i := range elements {
         myStack.Push(i)
     }
     fmt.Println("No goroutines, single thread:", time.Since(startTime).Truncate(time.Second))
@@ -26,7 +26,7 @@ func BenchMultipleGoroutines() {
     wg := sync.WaitGroup{}
     wg.Add(elements)
     startTime := time.Now()
-    for i := 0; i < elements; i++ {
+    for i := range elements {
         go func() {
             myStack.Push(i)
             wg.Done()
@@ -44,9 +44,9 @@ func BenchNotManyGoroutines() {
         wg := sync.WaitGroup{}
         wg.Add(elements)
         startTime := time.Now()
-        for i := 0; i < numOfGoroutines; i++ {
+        for range numOfGoroutines {
             go func() {
-                for j := 0; j < elements/numOfGoroutines; j++ {
+                for j := range elements / numOfGoroutines {
                     myStack.Push(j)
                     wg.Done()
                 }
