@@ -31,7 +31,7 @@ func TestPop(t *testing.T) {
 }
 
 func TestPush(t *testing.T) {
-    const elements = 100000
+    const elements = 123
     myStack := NewStack[int]()
     for i := 0; i < elements; i++ {
         myStack.Push(i)
@@ -43,7 +43,7 @@ func TestPush(t *testing.T) {
 }
 
 func TestPushConcurrently(t *testing.T) {
-    const goroutineNumber = 100000
+    const goroutineNumber = 123
     myStack := NewStack[int]()
     wg := sync.WaitGroup{}
     wg.Add(goroutineNumber)
@@ -57,5 +57,51 @@ func TestPushConcurrently(t *testing.T) {
 
     if goroutineNumber != myStack.Size() {
         t.Errorf("Expected %d elements, but got %d", goroutineNumber, myStack.Size())
+    }
+}
+
+// Num of elements = LCM(2,3,4,...,12) * 3000
+// 12 is runtime.GOMAXPROCS(0) on my pc
+const elements = 83_160_000
+
+func BenchmarkStack_PushNoGoroutines(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        myStack := NewStack[int]()
+        for i := 0; i < elements; i++ {
+            myStack.Push(i)
+        }
+    }
+}
+
+func BenchmarkStack_PushGoroutines(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        myStack := NewStack[int]()
+        wg := sync.WaitGroup{}
+        wg.Add(elements)
+        for i := 0; i < elements; i++ {
+            go func() {
+                myStack.Push(i)
+                wg.Done()
+            }()
+        }
+        wg.Wait()
+    }
+}
+
+func BenchmarkStack_PushSmartGoroutines(b *testing.B) {
+    const numOfGoroutines = 6
+    for i := 0; i < b.N; i++ {
+        myStack := NewStack[int]()
+        wg := sync.WaitGroup{}
+        wg.Add(elements)
+        for i := 0; i < numOfGoroutines; i++ {
+            go func() {
+                for j := 0; j < elements/numOfGoroutines; j++ {
+                    myStack.Push(j)
+                    wg.Done()
+                }
+            }()
+        }
+        wg.Wait()
     }
 }
