@@ -1,12 +1,12 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
 )
 
 func main() {
-    fmt.Println("Hello world!")
-    /*BenchSingleThread()
-      BenchMultipleGoroutines()
-      BenchNotManyGoroutines()*/
+	fmt.Println("Hello world!")
+	/*BenchSingleThread()
+	  BenchMultipleGoroutines()
+	  BenchNotManyGoroutines()*/
 }

@@ -1,40 +1,40 @@
 package stack
 
 import (
-    "errors"
-    "fmt"
-    "strconv"
-    "strings"
-    "sync/atomic"
-    "unsafe"
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
+	"sync/atomic"
+	"unsafe"
 )
 
 type node[T any] struct {
-    value T
-    next  unsafe.Pointer
+	value T
+	next  unsafe.Pointer
 }
 
 type Stack[T any] struct {
-    head unsafe.Pointer
+	head unsafe.Pointer
 }
 
 // NewStack creates new stack instance.
 func NewStack[T any]() Stack[T] {
-    return Stack[T]{}
+	return Stack[T]{}
 }
 
 // Push value to top of stack.
 //
-//Concurrency-safety, possible to use with many goroutines.
+// Concurrency-safety, possible to use with many goroutines.
 func (s *Stack[T]) Push(value T) {
-    newNode := &node[T]{value: value}
-    for {
-        head := atomic.LoadPointer(&s.head)
-        newNode.next = head
-        if atomic.CompareAndSwapPointer(&s.head, head, unsafe.Pointer(newNode)) {
-            return
-        }
-    }
+	newNode := &node[T]{value: value}
+	for {
+		head := atomic.LoadPointer(&s.head)
+		newNode.next = head
+		if atomic.CompareAndSwapPointer(&s.head, head, unsafe.Pointer(newNode)) {
+			return
+		}
+	}
 }
 
 // Pop removes value from top of stack. Returns removed value or
@@ -42,27 +42,27 @@ func (s *Stack[T]) Push(value T) {
 //
 // Concurrency-safety, possible to use with many goroutines.
 func (s *Stack[T]) Pop() (T, error) {
-    for {
-        head := s.head
-        if head == nil {
-            var nilVal T
-            return nilVal, errors.New("pop on empty stack")
-        }
-        n := *(*node[T])(head)
-        if atomic.CompareAndSwapPointer(&s.head, head, n.next) {
-            return n.value, nil
-        }
-    }
+	for {
+		head := s.head
+		if head == nil {
+			var nilVal T
+			return nilVal, errors.New("pop on empty stack")
+		}
+		n := *(*node[T])(head)
+		if atomic.CompareAndSwapPointer(&s.head, head, n.next) {
+			return n.value, nil
+		}
+	}
 }
 
 // Top returns last element in stack. Returns false if stack was empty.
 func (s *Stack[T]) Top() (T, bool) {
-    if s.head == nil {
-        var nilVal T
-        return nilVal, false
-    }
-    head := *(*node[T])(s.head)
-    return head.value, true
+	if s.head == nil {
+		var nilVal T
+		return nilVal, false
+	}
+	head := *(*node[T])(s.head)
+	return head.value, true
 }
 
 // String describes how many elements on stack, returns
@@ -70,23 +70,23 @@ func (s *Stack[T]) Top() (T, bool) {
 //
 // Aware: not concurrency-safety.
 func (s *Stack[T]) String() string {
-    if s.head == nil {
-        return "Empty stack"
-    }
-    elemCounter := 0
-    curHead := s.head
-    for curHead != nil {
-        head := *(*node[T])(curHead)
-        elemCounter++
-        curHead = head.next
-    }
-    return fmt.Sprintf("%d elements in stack", elemCounter)
+	if s.head == nil {
+		return "Empty stack"
+	}
+	elemCounter := 0
+	curHead := s.head
+	for curHead != nil {
+		head := *(*node[T])(curHead)
+		elemCounter++
+		curHead = head.next
+	}
+	return fmt.Sprintf("%d elements in stack", elemCounter)
 }
 
 // Size returns number of elements in stack.
 //
 // Aware: not concurrency-safety.
 func (s *Stack[T]) Size() int {
-    elementsInStack, _ := strconv.Atoi(strings.Fields(s.String())[0])
-    return elementsInStack
+	elementsInStack, _ := strconv.Atoi(strings.Fields(s.String())[0])
+	return elementsInStack
 }
