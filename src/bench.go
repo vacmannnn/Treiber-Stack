@@ -18,7 +18,7 @@ func BenchSingleThread() {
     for i := range elements {
         myStack.Push(i)
     }
-    fmt.Println("No goroutines, single thread:", time.Since(startTime).Truncate(time.Second))
+    fmt.Println("No goroutines, single thread:", time.Since(startTime).Truncate(time.Millisecond))
 }
 
 func BenchMultipleGoroutines() {
@@ -33,7 +33,7 @@ func BenchMultipleGoroutines() {
         }()
     }
     wg.Wait()
-    fmt.Println(elements, "goroutines:", time.Since(startTime).Truncate(time.Second))
+    fmt.Println(elements, "goroutines:", time.Since(startTime).Truncate(time.Millisecond))
 }
 
 func BenchNotManyGoroutines() {
@@ -53,6 +53,6 @@ func BenchNotManyGoroutines() {
             }()
         }
         wg.Wait()
-        fmt.Println(numOfGoroutines, "goroutines:", time.Since(startTime).Truncate(time.Second))
+        fmt.Println(numOfGoroutines, "goroutines:", time.Since(startTime).Truncate(time.Millisecond))
     }
 }
