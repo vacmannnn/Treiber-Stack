@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Treiber-Stack/stack"
 	"fmt"
+	"github.com/vacmannnn/Treiber-Stack/stack"
 	"runtime"
 	"sync"
 	"time"
