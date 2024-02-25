@@ -9,7 +9,10 @@ func TestPop(t *testing.T) {
 	myStack := NewStack[int]()
 	elements := 3
 	for i := 0; i < elements; i++ {
-		myStack.Push(i)
+		err := myStack.Push(i)
+		if err != nil {
+			t.Errorf("Nil pointer to stack")
+		}
 	}
 	if myStack.String() != "3 elements in stack" {
 		t.Errorf("Expected %d elements, but get %d", elements, myStack.Size())
@@ -34,7 +37,10 @@ func TestPush(t *testing.T) {
 	const elements = 123
 	myStack := NewStack[int]()
 	for i := 0; i < elements; i++ {
-		myStack.Push(i)
+		err := myStack.Push(i)
+		if err != nil {
+			t.Errorf("Nil pointer to stack")
+		}
 	}
 
 	if elements != myStack.Size() {
@@ -49,7 +55,10 @@ func TestPushConcurrently(t *testing.T) {
 	wg.Add(goroutineNumber)
 	for i := 0; i < goroutineNumber; i++ {
 		go func(i int) {
-			myStack.Push(i)
+			err := myStack.Push(i)
+			if err != nil {
+				t.Errorf("Nil pointer to stack")
+			}
 			wg.Done()
 		}(i)
 	}
@@ -68,7 +77,10 @@ func BenchmarkStack_PushNoGoroutines(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		myStack := NewStack[int]()
 		for i := 0; i < elements; i++ {
-			myStack.Push(i)
+			err := myStack.Push(i)
+			if err != nil {
+				b.Errorf("Nil pointer to stack")
+			}
 		}
 	}
 }
@@ -80,7 +92,10 @@ func BenchmarkStack_PushGoroutines(b *testing.B) {
 		wg.Add(elements)
 		for i := 0; i < elements; i++ {
 			go func() {
-				myStack.Push(i)
+				err := myStack.Push(i)
+				if err != nil {
+					b.Errorf("Nil pointer to stack")
+				}
 				wg.Done()
 			}()
 		}
@@ -97,7 +112,10 @@ func BenchmarkStack_PushSmartGoroutines(b *testing.B) {
 		for i := 0; i < numOfGoroutines; i++ {
 			go func() {
 				for j := 0; j < elements/numOfGoroutines; j++ {
-					myStack.Push(j)
+					err := myStack.Push(j)
+					if err != nil {
+						b.Errorf("Nil pointer to stack")
+					}
 					wg.Done()
 				}
 			}()
