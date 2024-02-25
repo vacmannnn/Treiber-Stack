@@ -26,13 +26,16 @@ func NewStack[T any]() Stack[T] {
 // Push value to top of stack.
 //
 // Concurrency-safety, possible to use with many goroutines.
-func (s *Stack[T]) Push(value T) {
+func (s *Stack[T]) Push(value T) error {
+	if s == nil {
+		return errors.New("nil pointer to stack")
+	}
 	newNode := &node[T]{value: value}
 	for {
 		head := atomic.LoadPointer(&s.head)
 		newNode.next = head
 		if atomic.CompareAndSwapPointer(&s.head, head, unsafe.Pointer(newNode)) {
-			return
+			return nil
 		}
 	}
 }
@@ -42,6 +45,10 @@ func (s *Stack[T]) Push(value T) {
 //
 // Concurrency-safety, possible to use with many goroutines.
 func (s *Stack[T]) Pop() (T, error) {
+	if s == nil {
+		var nilVal T
+		return nilVal, errors.New("nil pointer to stack")
+	}
 	for {
 		head := s.head
 		if head == nil {
@@ -57,7 +64,7 @@ func (s *Stack[T]) Pop() (T, error) {
 
 // Top returns last element in stack. Returns false if stack was empty.
 func (s *Stack[T]) Top() (T, bool) {
-	if s.head == nil {
+	if s == nil || s.head == nil {
 		var nilVal T
 		return nilVal, false
 	}
@@ -70,7 +77,7 @@ func (s *Stack[T]) Top() (T, bool) {
 //
 // Aware: not concurrency-safety.
 func (s *Stack[T]) String() string {
-	if s.head == nil {
+	if s == nil || s.head == nil {
 		return "Empty stack"
 	}
 	elemCounter := 0
