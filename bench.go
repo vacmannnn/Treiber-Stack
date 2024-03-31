@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/vacmannnn/Treiber-Stack/backoffStack"
-	"github.com/vacmannnn/Treiber-Stack/stack"
 	"runtime"
 	"sync"
 	"time"
@@ -13,8 +11,13 @@ import (
 // 12 is runtime.GOMAXPROCS(0) on my pc
 const elements = 83_160_000
 
-func BenchSingleThread() {
-	myStack := stack.NewStack[int]()
+type stackInt[T any] interface {
+	Pop() (T, error)
+	Push(val T) error
+	String() string
+}
+
+func BenchSingleThread(myStack stackInt[int]) {
 	startTime := time.Now()
 	for i := range elements {
 		_ = myStack.Push(i)
@@ -22,8 +25,7 @@ func BenchSingleThread() {
 	fmt.Println("No goroutines, single thread:", time.Since(startTime).Truncate(time.Millisecond))
 }
 
-func BenchMultipleGoroutines() {
-	myStack := stack.NewStack[int]()
+func BenchMultipleGoroutines(myStack stackInt[int]) {
 	wg := sync.WaitGroup{}
 	wg.Add(elements)
 	startTime := time.Now()
@@ -37,11 +39,10 @@ func BenchMultipleGoroutines() {
 	fmt.Println(elements, "goroutines:", time.Since(startTime).Truncate(time.Millisecond))
 }
 
-func BenchNotManyGoroutines() {
+func BenchNotManyGoroutines(myStack stackInt[int]) {
 	for j := 1; j <= 12; j++ {
 		runtime.GOMAXPROCS(j)
 		numOfGoroutines := runtime.GOMAXPROCS(0)
-		myStack := stack.NewStack[int]()
 		wg := sync.WaitGroup{}
 		wg.Add(elements)
 		startTime := time.Now()
@@ -58,37 +59,34 @@ func BenchNotManyGoroutines() {
 	}
 }
 
-var threadsNum = [...]int{2, 4, 6, 8, 10, 12}
-
-func BenchPopAndPush() {
-	cStack := backoffStack.NewStack[int]()
-	abc := 24_000_000
-	// bStack := backoffStack.NewStack[int]()
-	for i := 0; i < abc/24; i++ {
-		cStack.Push(123)
+func BenchPopAndPush(cStack stackInt[int]) {
+	curElems := elements / 2
+	for i := 0; i < curElems; i++ {
+		_ = cStack.Push(123)
 	}
 	fmt.Println(&cStack)
 	wg := sync.WaitGroup{}
-	wg.Add(8)
+	threads := 4
+	wg.Add(threads * 2)
 	now := time.Now()
-	for i := 0; i < 4; i++ {
+	for i := 0; i < threads; i++ {
 		go func() {
-			for j := 0; j < abc/4; j++ {
-				cStack.Push(123)
+			for j := 0; j < curElems/threads; j++ {
+				_ = cStack.Push(123)
 			}
 			wg.Done()
 		}()
 	}
 	fmt.Println(&cStack)
-	for i := 0; i < 4; i++ {
+	for i := 0; i < threads; i++ {
 		go func() {
-			for j := 0; j < abc/4; j++ {
-				cStack.Pop()
+			for j := 0; j < curElems/threads; j++ {
+				_, _ = cStack.Pop()
 			}
 			wg.Done()
 		}()
 	}
 	wg.Wait()
-	fmt.Println("time:", time.Since(now).Truncate(time.Millisecond))
+	fmt.Println("time:", time.Since(now).Truncate(time.Millisecond), "threads:", threads)
 	fmt.Println(&cStack)
 }

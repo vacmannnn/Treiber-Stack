@@ -6,7 +6,8 @@ import (
 
 func main() {
 	fmt.Println("Hello world!")
-	/*BenchSingleThread()
-	  BenchMultipleGoroutines()
-	  BenchNotManyGoroutines()*/
+	// BenchSingleThread()
+	// BenchMultipleGoroutines()
+	// BenchNotManyGoroutines()
+	// BenchPopAndPush()
 }
